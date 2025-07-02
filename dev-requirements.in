@@ -1,0 +1,21 @@
+# Development dependencies
+-r requirements.in
+
+# Testing
+pytest>=7.4.2
+pytest-asyncio>=0.21.1
+pytest-cov>=4.1.0
+
+# Code quality
+black>=23.10.0  # Code formatting
+isort>=5.12.0  # Import sorting
+flake8>=6.1.0  # Linting
+mypy>=1.6.1  # Type checking
+
+# Documentation
+mkdocs>=1.5.3
+mkdocs-material>=9.4.6
+
+# Development tools
+pip-tools>=7.3.0  # Dependency management
+watchdog>=3.0.0  # File watching for auto-reload
