@@ -1,47 +1,51 @@
-from nicegui import ui, app as nicegui_app
-from fastapi import FastAPI
+```python
+"""NiceGUI integration setup for FastAPI"""
 
-from app.core.config import settings
-from app.core.logging import app_logger
+from typing import Optional
+from app.core.logging import get_logger
 
-def setup_nicegui(fastapi_app: FastAPI, ui_instance=None, settings_instance=None):
-    """Sets up NiceGUI integration with FastAPI.
-    
-    Args:
-        fastapi_app: The FastAPI application instance
-        ui_instance: Optional NiceGUI UI instance (if not provided, uses imported ui)
-        settings_instance: Optional settings instance (if not provided, uses imported settings)
-    """
+logger = get_logger(__name__)
+
+def setup_nicegui(fastapi_app) -> None:
+    """Setup NiceGUI integration with FastAPI app"""
     try:
-        app_logger.info("Setting up NiceGUI integration...")
+        from nicegui import app as nicegui_app
         
-        # Use provided instances or fall back to imports
-        ui_obj = ui_instance or ui
-        config = settings_instance or settings
+        # Mount FastAPI app with NiceGUI
+        nicegui_app.include_router(fastapi_app)
         
-        # Default mount path if not specified
-        mount_path = getattr(config, 'NICEGUI_MOUNT_PATH', '/')
+        logger.info("NiceGUI integration with FastAPI configured successfully")
         
-        # Mount NiceGUI to FastAPI
-        ui_obj.run_with(fastapi_app, 
-                    mount_path=mount_path, 
-                    storage_secret=config.SECRET_KEY)
-        
-        app_logger.info(f"NiceGUI mounted at {mount_path}")
-        app_logger.info("NiceGUI setup complete.")
-        
-        # Return the UI instance for convenience
-        return ui_obj
     except ImportError as e:
-        if "uvicorn" in str(e):
-            import sys
-            print("Error: uvicorn module not found or not properly installed.")
-            print("Please ensure uvicorn is installed with:")
-            print("  pip install 'uvicorn[standard]'")
-            print("\nIf you're using a virtual environment, make sure it's activated:")
-            if sys.platform == "win32":
-                print("  venv\Scripts\activate")
-            else:
-                print("  source venv/bin/activate")
-            sys.exit(1)
+        logger.error(f"NiceGUI not available: {e}")
         raise
+    except Exception as e:
+        logger.error(f"Error setting up NiceGUI integration: {e}")
+        raise
+
+def configure_nicegui_settings(
+    title: str = "Adidas Shoe Store",
+    favicon: Optional[str] = None,
+    dark: Optional[bool] = None
+) -> None:
+    """Configure NiceGUI global settings"""
+    try:
+        from nicegui import app as nicegui_app
+        
+        # Configure app settings
+        if title:
+            nicegui_app.title = title
+        
+        if favicon:
+            nicegui_app.favicon = favicon
+            
+        if dark is not None:
+            nicegui_app.dark = dark
+        
+        logger.info(f"NiceGUI settings configured: title='{title}'")
+        
+    except ImportError:
+        logger.warning("NiceGUI not available for configuration")
+    except Exception as e:
+        logger.error(f"Error configuring NiceGUI settings: {e}")
+```
