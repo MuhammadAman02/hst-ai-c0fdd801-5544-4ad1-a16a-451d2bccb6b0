@@ -1,70 +1,64 @@
-from typing import Generator, Optional
-from contextlib import contextmanager
+```python
+"""Database configuration and session management"""
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase, Session
-
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from contextlib import contextmanager
+from typing import Generator
 from app.core.config import settings
-from app.core.logging import app_logger
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+# Create engine with proper configuration
+engine = create_engine(
+    settings.DATABASE_URL,
+    echo=settings.DEBUG,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
+)
+
+# Create session factory
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class Base(DeclarativeBase):
-    """Base class for all SQLAlchemy models."""
+    """Base class for all SQLAlchemy models"""
     pass
 
-engine = None
-SessionLocal = None
-
-def setup_database() -> None:
-    """Initialize database connection and create tables if enabled."""
-    global engine, SessionLocal
-
-    if not settings.ENABLE_DATABASE:
-        app_logger.info("Database is disabled by configuration.")
-        return
-
-    if not settings.DATABASE_URL:
-        app_logger.warning("Database URL not configured, but ENABLE_DATABASE is True.")
-        return
-
+def create_tables():
+    """Create all database tables"""
     try:
-        engine = create_engine(
-            settings.DATABASE_URL,
-            pool_pre_ping=True,
-            pool_recycle=3600,
-            echo=settings.DEBUG,
-        )
-        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        app_logger.info(f"Database connection established: {settings.DATABASE_URL.split('@')[-1].split('/')[-1]}")
-        create_tables()
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created successfully")
     except Exception as e:
-        app_logger.error(f"Failed to connect to database: {e}")
+        logger.error(f"Error creating database tables: {e}")
         raise
 
-def get_db() -> Generator[Session, None, None]:
-    """Dependency for FastAPI to get a database session."""
-    if not SessionLocal:
-        raise RuntimeError("Database not initialized or enabled.")
-    db = SessionLocal()
+def drop_tables():
+    """Drop all database tables"""
     try:
-        yield db
-    finally:
-        db.close()
+        Base.metadata.drop_all(bind=engine)
+        logger.info("Database tables dropped successfully")
+    except Exception as e:
+        logger.error(f"Error dropping database tables: {e}")
+        raise
 
 @contextmanager
-def get_db_context() -> Generator[Session, None, None]:
-    """Context manager for database sessions."""
-    if not SessionLocal:
-        raise RuntimeError("Database not initialized or enabled.")
-    db = SessionLocal()
+def get_db_session() -> Generator[Session, None, None]:
+    """Get database session with automatic cleanup"""
+    session = SessionLocal()
     try:
-        yield db
+        yield session
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Database session error: {e}")
+        raise
     finally:
-        db.close()
+        session.close()
 
-def create_tables() -> None:
-    """Create all tables defined in SQLAlchemy models."""
-    if not engine:
-        app_logger.warning("Database engine not initialized.")
-        return
-    Base.metadata.create_all(bind=engine)
-    app_logger.info("Database tables created successfully.")
+def get_db() -> Generator[Session, None, None]:
+    """Database session dependency for FastAPI"""
+    with get_db_session() as session:
+        yield session
+```
