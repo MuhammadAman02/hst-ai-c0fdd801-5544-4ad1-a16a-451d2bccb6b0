@@ -1,270 +1,243 @@
-# HST AI Python Engineer Project Base (2025 Edition)
+```markdown
+# Adidas Shoe Store 🏃‍♂️👟
 
-A modern, production-ready foundation for building Python web applications with best practices for 2025. This project base is designed to work seamlessly with the HST AI Python Engineer prompt.
+A modern, responsive e-commerce web application for browsing and purchasing Adidas footwear. Built with NiceGUI for an exceptional user experience and SQLAlchemy for robust data management.
 
-## Features
+## ✨ Features
 
-- **Framework Flexibility**: Support for multiple UI frameworks (NiceGUI, FastAPI+Jinja2, ReactPy)
-- **UI-First Development**: Prioritizes creating responsive, modern UIs before complex backend features
-- **SQLAlchemy V2 Ready**: Updated database patterns using SQLAlchemy 2.0
-- **Pydantic V2 Compatible**: Uses the latest Pydantic patterns for data validation
-- **Docker Support**: Production-ready containerization with a multi-stage Dockerfile
-- **Fly.io Optimized**: Includes a `fly.toml` for easy deployment with auto-scaling
-- **Version Compatibility**: Carefully selected dependency versions to ensure stability
-- **Environment Configuration**: Uses `.env` files with pydantic-settings for type-safe configuration
+- **Product Catalog**: Browse the complete Adidas shoe collection
+- **Category Filtering**: Filter by Running, Lifestyle, Basketball, and Training
+- **Search Functionality**: Find shoes by name, brand, or description
+- **Product Details**: View detailed information, sizes, colors, and stock
+- **Shopping Cart**: Add items, manage quantities, and proceed to checkout
+- **Responsive Design**: Optimized for desktop and mobile devices
+- **Real-time Updates**: Dynamic cart updates and stock management
 
-## Project Structure
-
-```
-project_base/
-├── app/
-│   ├── __init__.py
-│   ├── api/            # API endpoints (e.g., FastAPI routers)
-│   │   └── __init__.py
-│   ├── core/           # Core configuration, settings, error handling, logging
-│   │   └── __init__.py
-│   ├── frontend/       # UI implementations (e.g., NiceGUI pages, ReactPy components, FastAPI routes)
-│   │   ├── __init__.py
-│   │   # ├── nicegui_app.py  # Example: NiceGUI implementation
-│   │   # ├── reactpy_app.py  # Example: ReactPy implementation
-│   │   # └── routes.py       # Example: FastAPI frontend routes
-│   ├── generated/      # AI-generated application code
-│   │   └── __init__.py
-│   ├── models/         # Data models & schemas (e.g., Pydantic, SQLAlchemy)
-│   │   └── __init__.py
-│   ├── services/       # Business logic & external API integrations
-│   │   └── __init__.py
-│   ├── static/         # Static assets (CSS, JS, images). ALL image files MUST be placed here or in subdirectories within static/. Do NOT create separate top-level image directories like 'pictures/'.
-│   ├── templates/      # HTML templates (Jinja2)
-│   └── main.py         # Defines FastAPI routes and application logic for the 'app' module
-├── .dockerignore         # Specifies intentionally untracked files for Docker
-├── .env                  # Environment variables (create this file based on .env.example if provided)
-├── Dockerfile            # Container configuration
-├── fly.toml              # fly.io deployment configuration
-├── main.py               # Application entry point (runs the Uvicorn server)
-├── README.md             # This file
-└── requirements.txt      # Python dependencies
-```
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.8+
-- Docker (optional, for containerized deployment)
-- Fly.io account and `flyctl` CLI (optional, for Fly.io deployment)
+- Python 3.9 or higher
+- pip (Python package installer)
 
 ### Installation
 
-#### Dependency Management
-
-This project uses pip-tools for dependency management to ensure compatibility and reproducibility. The workflow is as follows:
-
-1. Direct dependencies with version constraints are specified in `requirements.in` (production) and `dev-requirements.in` (development)
-2. The `pip-compile` command (from pip-tools) generates pinned `requirements.txt` and `dev-requirements.txt` files with exact versions
-3. The pinned dependencies are installed with `pip install -r requirements.txt` (or `dev-requirements.txt` for development)
-
-To update dependencies:
-
-```bash
-# Install pip-tools if not already installed
-pip install pip-tools
-
-# Edit requirements.in or dev-requirements.in with your desired dependencies
-
-# Compile both requirements files
-python compile_requirements.py
-
-# OR use pip-compile directly for each file
-pip-compile --output-file=requirements.txt --resolver=backtracking requirements.in
-pip-compile --output-file=dev-requirements.txt --resolver=backtracking dev-requirements.in
-
-# Install the pinned dependencies
-# For production:
-pip install -r requirements.txt
-# For development:
-pip install -r dev-requirements.txt
-```
-
-**Note**: `dev-requirements.in` includes `-r requirements.in` to inherit all production dependencies.
-
-#### Dependency Compatibility
-
-**Important Note**: This project has specific version requirements to ensure compatibility:
-
-- **NiceGUI 1.4.21-1.4.24** requires **FastAPI >=0.109.1,<0.110.0**
-- If you need to use a newer FastAPI version (>=0.115.0), you'll need to upgrade to NiceGUI 2.0+ when available
-
-The requirements.txt file has been configured with compatible versions. Do not modify these version constraints unless you're prepared to resolve dependency conflicts.
-
-#### Automatic Setup (Recommended)
-
-1. Clone the repository
-2. Run the appropriate setup script for your operating system:
-
-   **Windows:**
-   ```
-   setup_and_run.bat
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd adidas-shoe-store
    ```
 
-   **Unix/MacOS:**
-   ```
-   chmod +x setup_and_run.sh
-   ./setup_and_run.sh
-   ```
-
-   **Alternative (All platforms):**
-   ```
-   python setup.py
-   ```
-
-   These scripts will:
-   - Check your Python version
-   - Create a virtual environment
-   - Install all dependencies
-   - Verify critical dependencies
-   - Provide activation instructions
-   - Optionally run the application
-
-#### Manual Setup
-
-1. Clone the repository
-2. Create a virtual environment:
-   ```
+2. **Create and activate virtual environment**
+   ```bash
+   # Windows
    python -m venv venv
-   ```
-3. Activate the virtual environment:
-   - Windows:
-     ```
-     venv\Scripts\activate
-     ```
-   - Unix/MacOS:
-     ```
-     source venv/bin/activate
-     ```
-4. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-5. Verify installation:
-   ```
-   python -c "import uvicorn, fastapi, nicegui; print('Dependencies successfully installed!')"
+   venv\Scripts\activate
+
+   # macOS/Linux
+   python -m venv venv
+   source venv/bin/activate
    ```
 
-#### Troubleshooting
-
-##### "uvicorn: command not found" Error
-
-If you encounter this error when running the application, it means the `uvicorn` command is not in your PATH. This typically happens when:
-
-1. The virtual environment is not activated
-2. The `uvicorn` package was not installed correctly
-
-**Solution:**
-
-1. Ensure your virtual environment is activated:
-   - Windows: `venv\Scripts\activate`
-   - Unix/MacOS: `source venv/bin/activate`
-
-2. Reinstall the dependencies:
-   ```
+3. **Install dependencies**
+   ```bash
    pip install -r requirements.txt
    ```
 
-3. Run the application using the Python module syntax instead of the command:
+4. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env file with your configuration
    ```
-   python -m uvicorn main:app --reload
-   ```
 
-4. **Create a `.env` file** in the `project_base` directory (you can copy `.env.example` if one exists and modify it). At a minimum, it might look like this if you want to change the default port:
-   ```env
-   PORT=8000
-   HOST=0.0.0.0
-   ```
-   If no `.env` file is present, the application will use default values (e.g., port 8000).
-
-### Running the Application Locally
-
-#### Method 1: Using main.py (Recommended)
-
-1. **Ensure your virtual environment is activated:**
-   - Windows: `venv\Scripts\activate`
-   - Unix/MacOS: `source venv/bin/activate`
-
-2. **Start the application:**
+5. **Run the application**
    ```bash
    python main.py
    ```
 
-#### Method 2: Using uvicorn directly
+6. **Open your browser**
+   Navigate to `http://localhost:8080`
 
-1. **Ensure your virtual environment is activated:**
-   - Windows: `venv\Scripts\activate`
-   - Unix/MacOS: `source venv/bin/activate`
+## 🏗️ Project Structure
 
-2. **Start the application using the uvicorn command:**
+```
+adidas-shoe-store/
+├── app/
+│   ├── main.py                 # Main NiceGUI application
+│   ├── models/
+│   │   └── product.py          # Database models
+│   ├── services/
+│   │   ├── product_service.py  # Product business logic
+│   │   └── cart_service.py     # Shopping cart logic
+│   ├── core/
+│   │   ├── config.py          # Application settings
+│   │   ├── database.py        # Database configuration
+│   │   └── logging.py         # Logging setup
+│   └── api/
+│       └── router.py          # API endpoints
+├── data/                      # Database files
+├── main.py                    # Application entry point
+├── requirements.txt           # Python dependencies
+├── .env.example              # Environment template
+└── README.md                 # This file
+```
+
+## 🛠️ Technology Stack
+
+- **Frontend**: NiceGUI (Python-based web UI framework)
+- **Backend**: FastAPI (High-performance web framework)
+- **Database**: SQLAlchemy with SQLite (easily upgradeable to PostgreSQL)
+- **Validation**: Pydantic V2 (Data validation and settings)
+- **Styling**: Tailwind CSS (via NiceGUI)
+
+## 📱 Features Overview
+
+### Product Catalog
+- Browse 8+ premium Adidas shoe models
+- High-quality product images
+- Detailed descriptions and specifications
+- Price and stock information
+
+### Shopping Experience
+- Intuitive product browsing
+- Advanced filtering and search
+- Size and color selection
+- Real-time cart updates
+- Streamlined checkout process
+
+### Responsive Design
+- Mobile-first approach
+- Optimized for all screen sizes
+- Touch-friendly interface
+- Fast loading times
+
+## 🔧 Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `APP_NAME` | Application name | Adidas Shoe Store |
+| `HOST` | Server host | 0.0.0.0 |
+| `PORT` | Server port | 8080 |
+| `DATABASE_URL` | Database connection string | sqlite:///./data/adidas_store.db |
+| `SECRET_KEY` | Security key for sessions | (change in production) |
+| `DEBUG` | Enable debug mode | False |
+
+### Database Configuration
+
+The application uses SQLite by default for easy setup. For production, you can switch to PostgreSQL:
+
+```bash
+# PostgreSQL example
+DATABASE_URL=postgresql://user:password@localhost/adidas_store
+```
+
+## 🧪 Development
+
+### Running in Development Mode
+
+```bash
+# Enable debug mode
+export DEBUG=True
+
+# Run with auto-reload
+python main.py
+```
+
+### Database Management
+
+```python
+# Create tables
+from app.core.database import create_tables
+create_tables()
+
+# Reset database
+from app.core.database import drop_tables, create_tables
+drop_tables()
+create_tables()
+```
+
+## 📦 Sample Data
+
+The application comes with pre-loaded sample data including:
+
+- **Ultraboost 22** - Premium running shoes
+- **Stan Smith** - Classic tennis shoes
+- **Superstar** - Iconic basketball shoes
+- **NMD_R1** - Street-style sneakers
+- **Gazelle** - Retro suede sneakers
+- **Samba OG** - Original indoor soccer shoes
+- **Adizero Boston 11** - Lightweight running shoes
+- **Forum Low** - Basketball heritage shoes
+
+## 🚀 Deployment
+
+### Production Deployment
+
+1. **Set production environment variables**
    ```bash
-   uvicorn main:app --reload
+   export DEBUG=False
+   export SECRET_KEY=your-secure-secret-key
+   export DATABASE_URL=your-production-database-url
    ```
 
-   If you encounter a "uvicorn: command not found" error, use the Python module syntax instead:
+2. **Use a production WSGI server**
    ```bash
-   python -m uvicorn main:app --reload
+   pip install gunicorn
+   gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
    ```
 
-#### Accessing the Application
+### Docker Deployment (Optional)
 
-- Open your browser and navigate to `http://localhost:8000` (or the port you specified in the `.env` file)
-- The NiceGUI UI will be available at `http://localhost:8000/ui`
+```dockerfile
+FROM python:3.11-slim
 
-## API Endpoints
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
--   `GET /`: Returns a welcome message.
--   `GET /health`: Returns a health status, useful for monitoring.
+COPY . .
+EXPOSE 8080
 
-## Deployment
+CMD ["python", "main.py"]
+```
 
-### Docker Deployment
+## 🤝 Contributing
 
-1.  **Build the Docker image:**
-    ```bash
-    docker build -t my-fastapi-app .
-    ```
-2.  **Run the Docker container:**
-    ```bash
-    docker run -p 8000:8000 -d my-fastapi-app
-    ```
-    Replace `8000:8000` with `<host_port>:<container_port>` if you need to map to a different host port. The container port is determined by the `PORT` environment variable set in the `Dockerfile` or `fly.toml` (defaulting to 8000).
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Fly.io Deployment
+## 📄 License
 
-1.  **Install `flyctl`**: Follow the instructions at [fly.io/docs/hands-on/install-flyctl/](https://fly.io/docs/hands-on/install-flyctl/).
-2.  **Login to Fly.io**: `fly auth login`
-3.  **Launch the app (first time only)**:
-    ```bash
-    fly launch --name your-unique-app-name --region sin
-    ```
-    (Replace `your-unique-app-name` and `sin` (Singapore) with your desired app name and region. This will also create a `fly.toml` if one doesn't exist, or update the existing one.)
-4.  **Deploy changes**:
-    ```bash
-    fly deploy
-    ```
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-The `fly.toml` file is pre-configured for auto-scaling and to stop machines when idle to save costs.
+## 🆘 Support
 
-## Customization
+If you encounter any issues:
 
--   **Add new API endpoints**: Modify `project_base/app/main.py` to include new routes and logic.
--   **Modify dependencies**: Update `project_base/requirements.txt` and reinstall.
--   **Adjust Docker configuration**: Edit `project_base/Dockerfile`.
--   **Change deployment settings**: Update `project_base/fly.toml` for Fly.io.
+1. Check the logs in the console
+2. Verify your Python version (3.9+)
+3. Ensure all dependencies are installed
+4. Check the `.env` configuration
 
-## Core Principles for Development
+For additional support, please open an issue in the repository.
 
-While this base is minimal, consider these principles as you expand your application:
+## 🎯 Roadmap
 
--   **Modularity**: Keep code organized into logical modules.
--   **Clarity**: Write clear, understandable code with type hints where appropriate.
--   **Testing**: Implement unit and integration tests for new features.
--   **Security**: Follow security best practices (input validation, authentication if needed, etc.).
--   **Documentation**: Keep this README and code comments up-to-date.
+- [ ] User authentication and accounts
+- [ ] Order history and tracking
+- [ ] Product reviews and ratings
+- [ ] Wishlist functionality
+- [ ] Payment integration
+- [ ] Admin dashboard
+- [ ] Email notifications
+- [ ] Advanced analytics
+
+---
+
+**Built with ❤️ using NiceGUI and FastAPI**
+```
